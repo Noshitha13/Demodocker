@@ -1,15 +1,25 @@
-FROM ubuntu
 
+# Use an official Python runtime as a parent image
+FROM python:3.13
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set the working directory in the container
 WORKDIR /app
 
-COPY requirements.txt /app
-COPY mysite /app
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-RUN apt-get update && \
-    apt-get install -y python3 python3-venv && \
-    python3 -m venv /venv && \
-    /venv/bin/pip install -r requirements.txt && \
-    cd mysite
+# Install dependencies directly
+RUN pip install django==5.1.4
 
-ENTRYPOINT ["/venv/bin/python3"]
-CMD ["manage.py", "runserver", "0.0.0.0:8000"]
+# Make port 8000 available to the world outside this container
+EXPOSE 8000
+
+# Define environment variables for the Django settings
+ENV DJANGO_SETTINGS_MODULE=myapp.settings
+
+# Run the application
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
